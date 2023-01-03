@@ -1,3 +1,7 @@
+import qualified Data.Map as M
+import Data.Maybe (mapMaybe)
+import Data.List.HT (takeUntil)
+
 -- | Day 03 part 1
 --
 -- >>> steps 1
@@ -11,7 +15,9 @@
 
 steps :: Int -> Int
 steps = dist . (!!) coords . pred
-    where coords = scanl add (0,0) $ concatMap shell [0..]
+
+coords :: [(Int, Int)]
+coords = scanl add (0,0) $ concatMap shell [0..]
 
 -- | Day 03 part 1
 --
@@ -29,6 +35,20 @@ shell :: Int -> [(Int, Int)]
 shell 0 = [(1,0)]
 shell n = replicate ((n*2)-1) (0,-1) ++ replicate (n*2) (-1,0) ++ replicate (n*2) (0,1) ++ replicate ((n*2)+1) (1,0)
 
+stress :: (Int, M.Map (Int, Int) Int) -> (Int, Int) -> (Int, M.Map(Int, Int) Int)
+stress (cur, prev) here = (nearSum, M.insertWith (const id) here nearSum prev)
+    where neighbours = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
+          near pos = map (add pos) neighbours
+          nearSum = sum $ mapMaybe (`M.lookup` prev) $ near here
+
+part2 :: Int -> Int
+part2 input = fst $ last $ takeUntil ((<) input . fst) $ scanl stress initial coords
+    where initial = (0, M.insert (0,0) 1 M.empty)
+
+part1 :: Int -> Int
+part1 = steps
+
 main = do
     input <- read <$> readFile "day03.txt"
-    print $ steps input
+    print $ part1 input
+    print $ part2 input
