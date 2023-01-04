@@ -34,6 +34,11 @@ part1 :: [Int] -> Int
 part1 banks = length (fst cycle) + length (snd cycle)
     where cycle = findCycle $ iterate step banks
 
+part2 :: [Int] -> Int
+part2 banks = length (snd cycle)
+    where cycle = findCycle $ iterate step banks
+
 main = do
     banks <- map read . words <$> readFile "day06.txt"
     print $ part1 banks
+    print $ part2 banks
