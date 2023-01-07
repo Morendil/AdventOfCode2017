@@ -21,3 +21,4 @@ dist (q,r,s) = (abs q + abs r + abs s) `div` 2
 main = do
     paths <- map (splitOn ",") . lines <$> readFile "day11.txt"
     print $ map (dist . moveAlong (0,0,0)) paths
+    print $ map (maximum . map dist . scanl move (0,0,0)) paths
