@@ -1,3 +1,5 @@
+module Day10 (knotHash) where
+
 import Data.List.Split
 import Data.Char (ord, chr)
 import Data.Bits (Bits(xor))
@@ -13,6 +15,8 @@ part2 :: String -> String
 part2 input = concatMap (printf "%02x" . foldl1 xor) $ chunksOf 16 sparseHash
     where lengths = pre input ++ suffix
           sparseHash = sparse lengths
+
+knotHash = part2
 
 sparse :: [Int] -> [Int]
 sparse lengths = fst $ last $ take 65 $ iterate knotHash initial
