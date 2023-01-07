@@ -27,5 +27,5 @@ agree (a,b) = a .&. 65535 == b .&. 65535
 
 main = do
     (genA:genB:_) <- map (read . filter isNumber) . lines <$> readFile "day15.txt"
-    -- print $ part1 (genA,genB)
+    print $ part1 (genA,genB)
     print $ part2 (genA,genB)
