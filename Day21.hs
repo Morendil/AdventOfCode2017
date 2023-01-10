@@ -12,7 +12,7 @@ assemble flat = concatMap (foldr1 (zipWith (++))) $ chunksOf side flat
     where side = floor $ sqrt $ fromIntegral $ length flat
 
 cutUp :: Int -> [String] -> [[String]]
-cutUp n = concatMap (chunksOf n) . transpose . map (chunksOf n)
+cutUp n = concat . transpose . map (chunksOf n) . transpose . map (chunksOf n)
 
 evolve :: [Rule] -> [String] -> [String]
 evolve rules grid | even (length grid) = assemble $ map (match rules) $ cutUp 2 grid
@@ -27,6 +27,11 @@ glider = [".#.","..#","###"]
 part1 :: [Rule] -> Int
 part1 rules = length $ filter (=='#') $ concat $ last $ take 6 $ iterate (evolve rules) glider
 
+part2 :: [Rule] -> Int
+part2 rules = length $ filter (=='#') $ concat $ last $ take 19 $ iterate (evolve rules) glider
+
 main = do
     rules <- map ((\[x,y] -> (x,y)) . map (splitOn "/") . splitOn " => ") . lines <$> readFile "day21.txt"
+    -- mapM_ putStrLn $ last $ take 6 $ iterate (evolve rules) glider
     print $ part1 rules
+    print $ part2 rules
