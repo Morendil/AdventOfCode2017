@@ -20,22 +20,30 @@ neighbours (partial, available) = straight ++ reversed
 score :: Partial -> Int
 score (bridge, _) = sum $ map (uncurry (+)) bridge
 
-neighboursM :: Partial -> State Partial [Partial]
-neighboursM partial = do
+neighboursM :: (Partial -> Partial -> Ordering) -> Partial -> State Partial [Partial]
+neighboursM criterion partial = do
     let next = neighbours partial
     winner <- get
-    put $ maximumBy (comparing score) (winner:next)
+    put $ maximumBy criterion (winner:next)
     return next
 
-part1 :: [Connector] -> Int
-part1 connectors = score $ snd result
-    where search = dfsM neighboursM (const $ return False) initial
+solve :: (Partial -> Partial -> Ordering) -> [Connector] -> Int
+solve criterion connectors = score $ snd result
+    where search = dfsM (neighboursM criterion) (const $ return False) initial
           result = runState search initial
           initial = ([], S.fromList connectors)
+
+part1 :: [Connector] -> Int
+part1 = solve (comparing score)
+
+part2 :: [Connector] -> Int
+part2 = solve (comparing (length.fst) `andThen` comparing score)
+    where andThen = mappend
 
 toPair :: [Int] -> (Int, Int)
 toPair [x,y] = (x,y)
 
 main = do
     connectors <- map (toPair . map read . splitOn "/") . lines <$> readFile "day24.txt"
-    print $ part1 connectors
+    -- print $ part1 connectors
+    print $ part2 connectors
